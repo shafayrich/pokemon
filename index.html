@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CardPocket – Collect, Battle & Trade</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23c47a5a' stroke='%23333' stroke-width='5'/><circle cx='50' cy='50' r='16' fill='white' stroke='%23333' stroke-width='5'/></svg>">
     <style>
         :root {
             --bg: #1e1e2a;
@@ -26,7 +25,7 @@
             box-sizing: border-box;
         }
         body {
-            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
@@ -54,7 +53,7 @@
             font-size: 1.5rem;
             color: var(--gold);
         }
-        .logo-icon {
+        .pokeball {
             width: 38px;
             height: 38px;
             background: conic-gradient(#c47a5a 0% 50%, white 50% 100%);
@@ -62,7 +61,7 @@
             border: 3px solid #333;
             position: relative;
         }
-        .logo-icon::after {
+        .pokeball::after {
             content: '';
             position: absolute;
             width: 12px;
@@ -146,7 +145,7 @@
         }
         .main-content {
             padding: 24px;
-            max-width: 1300px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         .tab-view {
@@ -157,7 +156,7 @@
         }
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 16px;
         }
         .pokemon-card {
@@ -165,36 +164,34 @@
             border-radius: var(--radius);
             overflow: hidden;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
             border: 2px solid var(--border);
             box-shadow: var(--shadow);
+            text-align: center;
         }
         .pokemon-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 14px 25px rgba(0, 0, 0, 0.5);
             border-color: var(--gold);
         }
-        .card-sprite {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 14px;
+        .card-art {
+            height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 140px;
+            background: rgba(0, 0, 0, 0.3);
         }
-        .card-sprite img {
+        .card-art img {
             max-width: 100%;
             max-height: 100%;
-            image-rendering: pixelated;
+            object-fit: contain;
         }
         .card-info {
-            padding: 12px;
-            text-align: center;
+            padding: 10px;
         }
         .card-name {
             font-weight: 800;
             text-transform: capitalize;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
         .rarity-badge {
             font-size: 0.65rem;
@@ -216,13 +213,25 @@
             background: var(--blue);
             color: white;
         }
-        .rarity-ultrarare {
+        .rarity-double-rare {
+            background: #d4a843;
+            color: #1a1a24;
+        }
+        .rarity-ultra-rare {
             background: #8a7a8a;
             color: white;
         }
-        .rarity-legendary {
-            background: linear-gradient(135deg, #f0d060, #b8923b);
+        .rarity-illustration-rare {
+            background: #e5905c;
+            color: white;
+        }
+        .rarity-special-illustration {
+            background: linear-gradient(135deg, #c47a5a, #f0d060);
             color: #1a1a24;
+        }
+        .rarity-hyper-rare {
+            background: #b8923b;
+            color: white;
         }
         .type-badge {
             display: inline-block;
@@ -293,7 +302,7 @@
         .type-fairy {
             background: #ee99ac;
         }
-        .pack-selection {
+        .pack-grid {
             display: flex;
             gap: 16px;
             flex-wrap: wrap;
@@ -312,11 +321,41 @@
         }
         .pack-card:hover {
             border-color: var(--gold);
-            background: #3a3a52;
         }
         .pack-icon {
             font-size: 2.5rem;
             margin-bottom: 10px;
+        }
+        .pack-rip-area {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+        .pack-rip-area.active {
+            display: block;
+        }
+        .rip-image {
+            width: 200px;
+            cursor: grab;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .rip-image:active {
+            cursor: grabbing;
+        }
+        .rip-bar {
+            width: 60%;
+            height: 12px;
+            background: #444;
+            border-radius: 6px;
+            margin: 16px auto;
+            overflow: hidden;
+        }
+        .rip-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.1s;
         }
         .flip-container {
             display: flex;
@@ -326,67 +365,50 @@
             margin-top: 20px;
         }
         .flip-card {
-            width: 140px;
-            height: 200px;
-            perspective: 1000px;
+            width: 150px;
+            height: 210px;
+            perspective: 800px;
             cursor: pointer;
         }
         .flip-card-inner {
             position: relative;
             width: 100%;
             height: 100%;
-            transition: transform 0.6s;
+            transition: transform 0.5s;
             transform-style: preserve-3d;
         }
         .flip-card.flipped .flip-card-inner {
             transform: rotateY(180deg);
         }
-        .flip-card-front,
-        .flip-card-back {
+        .flip-front,
+        .flip-back {
             position: absolute;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: var(--radius);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow);
         }
-        .flip-card-back {
+        .flip-back {
             background: linear-gradient(145deg, #4a4a5c, #3a3a4a);
             border: 2px solid var(--gold);
             font-size: 2rem;
             color: var(--gold);
         }
-        .flip-card-front {
+        .flip-front {
             background: var(--card-bg);
             transform: rotateY(180deg);
             flex-direction: column;
-            padding: 12px;
-            border: 2px solid var(--border);
+            padding: 8px;
+            border: 1px solid var(--border);
             text-align: center;
         }
-        .flip-card-front img {
-            width: 80px;
-            height: 80px;
-            image-rendering: pixelated;
-        }
-        .pack-rip-area {
-            text-align: center;
-            margin: 20px 0;
-            display: none;
-        }
-        .pack-rip-area.show {
-            display: block;
-        }
-        .rip-image {
-            width: 180px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .rip-image:active {
-            transform: scale(1.05);
+        .flip-front img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
         }
         .trade-offer {
             background: var(--surface);
@@ -405,8 +427,8 @@
             border: none;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.2s;
             font-size: 0.85rem;
+            transition: 0.2s;
         }
         .btn-primary {
             background: var(--accent);
@@ -444,17 +466,6 @@
             width: 90%;
             text-align: center;
             border: 2px solid var(--gold);
-            position: relative;
-        }
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 16px;
-            font-size: 1.6rem;
-            cursor: pointer;
-            color: #aaa;
-            background: none;
-            border: none;
         }
         .tutorial-overlay {
             position: fixed;
@@ -476,92 +487,6 @@
             width: 90%;
             text-align: center;
             border: 2px solid var(--gold);
-            position: relative;
-        }
-        .tutorial-close {
-            position: absolute;
-            top: 12px;
-            right: 18px;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: #aaa;
-            background: none;
-            border: none;
-        }
-        .battle-screen {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .battle-pokemon {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 20px;
-            text-align: center;
-            border: 2px solid var(--border);
-            width: 220px;
-        }
-        .hp-bar {
-            background: #444;
-            border-radius: 10px;
-            height: 14px;
-            margin: 8px 0;
-            overflow: hidden;
-        }
-        .hp-fill {
-            background: #2ecc71;
-            height: 100%;
-            transition: width 0.3s;
-        }
-        .move-btn {
-            display: block;
-            width: 100%;
-            padding: 9px;
-            margin: 5px 0;
-            border-radius: 12px;
-            background: var(--blue);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-        }
-        .friend-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .friend-entry {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 14px;
-            border: 2px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .chat-window {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 16px;
-            border: 2px solid var(--border);
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 14px;
-        }
-        .quiz-option {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin: 6px 0;
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            color: var(--text);
-            cursor: pointer;
-            font-weight: 600;
-            text-align: left;
-            font-size: 0.95rem;
         }
         .index-table {
             width: 100%;
@@ -569,24 +494,20 @@
             font-size: 0.9rem;
             background: var(--surface);
             border-radius: var(--radius);
-            overflow: hidden;
         }
         .index-table th,
         .index-table td {
             padding: 10px 14px;
             border-bottom: 1px solid var(--border);
-            text-align: left;
         }
     </style>
 </head>
 <body>
     <header class="header">
-        <div class="logo">
-            <div class="logo-icon"></div> CardPocket
-        </div>
+        <div class="logo"><div class="pokeball"></div>CardPocket</div>
         <div class="trainer-box">
-            <input type="text" id="trainer-name-input" placeholder="Trainer name" maxlength="14" value="Trainer">
-            <button id="save-trainer-btn">Save</button>
+            <input type="text" id="trainer-input" placeholder="Trainer name" maxlength="14" value="Trainer">
+            <button id="save-trainer">Save</button>
         </div>
         <div class="coins"><span class="coin-icon"></span> <span id="coin-balance">500</span> Coins</div>
         <nav class="nav-tabs" id="nav-tabs">
@@ -601,277 +522,247 @@
     </header>
 
     <main class="main-content">
-        <div class="tab-view visible" id="tab-collection">
-            <h2 style="margin-bottom:18px;">My Collection</h2>
-            <div class="card-grid" id="collection-grid"></div>
-        </div>
+        <div class="tab-view visible" id="tab-collection"><h2>My Collection</h2><div class="card-grid" id="collection-grid"></div></div>
         <div class="tab-view" id="tab-packs">
-            <h2 style="margin-bottom:18px;">Booster Packs</h2>
-            <div class="pack-selection" id="pack-selection"></div>
+            <h2>Booster Packs</h2>
+            <div class="pack-grid" id="pack-selection"></div>
             <div class="pack-rip-area" id="pack-rip-area">
-                <h3>Click the pack to rip it open!</h3>
+                <h3>Drag to rip open!</h3>
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Crect x='10' y='10' width='80' height='120' rx='10' fill='%234a4a5c' stroke='%23c9a96e' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23c47a5a' stroke='%23333' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='8' fill='white' stroke='%23333' stroke-width='2'/%3E%3Ctext x='50' y='100' text-anchor='middle' fill='%23c9a96e' font-size='14' font-weight='bold'%3EPACK%3C/text%3E%3C/svg%3E" class="rip-image" id="rip-image" alt="Pack">
-                <p id="rip-counter">Rips: 0/3</p>
+                <div class="rip-bar"><div class="rip-fill" id="rip-fill"></div></div>
+                <p id="rip-status">Drag the pack!</p>
             </div>
             <div class="flip-container" id="pack-flip-container"></div>
         </div>
-        <div class="tab-view" id="tab-battle">
-            <h2 style="margin-bottom:18px;">Arena Battle</h2>
-            <div class="battle-screen" id="battle-screen"></div>
-            <button class="btn btn-primary" id="find-battle-btn" style="margin-top:16px;">Find Opponent</button>
-        </div>
-        <div class="tab-view" id="tab-trades">
-            <h2 style="margin-bottom:18px;">Trade Offers</h2>
-            <div id="offers-container"></div>
-            <button class="btn btn-gold" id="refresh-offers-btn" style="margin-top:14px;">Refresh Offers</button>
-        </div>
-        <div class="tab-view" id="tab-friends">
-            <h2 style="margin-bottom:18px;">Friends & Chat</h2>
-            <div style="display:flex;gap:10px;margin-bottom:16px;">
-                <input type="text" id="friend-name-input" placeholder="Add friend name" style="flex:1;padding:10px 16px;border-radius:22px;background:var(--bg);border:2px solid var(--border);color:var(--text);">
-                <button class="btn btn-primary" id="add-friend-btn">Add</button>
-            </div>
-            <div class="friend-list" id="friend-list"></div>
-            <div class="chat-window" id="chat-window"></div>
-        </div>
-        <div class="tab-view" id="tab-learn">
-            <h2 style="margin-bottom:18px;">Pokémon Quiz</h2>
-            <div id="quiz-container"></div>
-        </div>
-        <div class="tab-view" id="tab-index">
-            <h2 style="margin-bottom:18px;">Pokédex Index</h2>
-            <button class="btn btn-primary" id="load-all-btn">Load All Pokémon</button>
-            <table class="index-table"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Rarity</th></tr></thead><tbody id="index-body"></tbody></table>
-        </div>
+        <div class="tab-view" id="tab-battle"><h2>Arena Battle</h2><div class="battle-screen" id="battle-screen"></div><button class="btn btn-primary" id="find-battle-btn">Find Opponent</button></div>
+        <div class="tab-view" id="tab-trades"><h2>Trade Offers</h2><div id="offers-container"></div><button class="btn btn-gold" id="refresh-offers">Refresh</button></div>
+        <div class="tab-view" id="tab-friends"><h2>Friends & Chat</h2><div><input id="friend-input" placeholder="Friend name"><button class="btn btn-primary" id="add-friend">Add</button></div><div class="friend-list" id="friend-list"></div><div class="chat-window" id="chat-window"></div></div>
+        <div class="tab-view" id="tab-learn"><h2>Quiz</h2><div id="quiz-container"></div></div>
+        <div class="tab-view" id="tab-index"><h2>Pokédex Index</h2><button class="btn btn-primary" id="load-all-btn">Load All 1,164 Pokémon</button><table class="index-table"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Art</th></tr></thead><tbody id="index-body"></tbody></table></div>
     </main>
 
-    <div class="modal-overlay" id="detail-modal">
-        <div class="modal-panel">
-            <button class="modal-close" id="modal-close">&times;</button>
-            <img id="modal-sprite" src="" style="width:120px;height:120px;image-rendering:pixelated;" alt="">
-            <h2 id="modal-name" style="text-transform:capitalize;margin:8px 0;"></h2>
-            <div id="modal-types" style="margin:6px 0;"></div>
-            <p>HP: <span id="modal-hp"></span> | ATK: <span id="modal-atk"></span> | DEF: <span id="modal-def"></span></p>
-            <p>SP.ATK: <span id="modal-spatk"></span> | SP.DEF: <span id="modal-spdef"></span> | SPD: <span id="modal-speed"></span></p>
-            <p id="modal-fact" style="color:var(--text-secondary);margin-top:10px;"></p>
-        </div>
-    </div>
-
-    <div class="tutorial-overlay hidden" id="tutorial-overlay">
-        <div class="tutorial-box">
-            <button class="tutorial-close" id="tutorial-close-btn">&times;</button>
-            <h2>Welcome to CardPocket!</h2>
-            <p style="margin:18px 0;font-size:1.1rem;color:var(--text-secondary);" id="tutorial-text"></p>
-            <div style="display:flex;justify-content:space-between;margin-top:24px;">
-                <button class="btn" id="tutorial-prev">Previous</button>
-                <button class="btn btn-primary" id="tutorial-next">Next</button>
-            </div>
-        </div>
-    </div>
+    <div class="modal-overlay" id="detail-modal"><div class="modal-panel"><button class="modal-close" id="modal-close">&times;</button><img id="modal-art" style="width:130px;"><h2 id="modal-name"></h2><p id="modal-fact"></p></div></div>
+    <div class="tutorial-overlay hidden" id="tutorial"><div class="tutorial-box"><button id="tutorial-close">&times;</button><h2>Welcome!</h2><p id="tutorial-text"></p><div><button class="btn" id="tutorial-prev">Previous</button><button class="btn btn-primary" id="tutorial-next">Next</button></div></div></div>
 
     <script>
         (function() {
             const allPokemon = [];
             const collection = new Set();
             let coins = 500;
-            let trainerName = "Trainer";
+            let trainer = "Trainer";
             let friends = [];
             let messages = {};
-            let tutorialStep = 0;
-            let ripCount = 0;
+            let currentTab = 'collection';
+            let ripProgress = 0;
+            let currentPack = null;
             let pendingCards = [];
-            let currentBattle = null;
+            let battle = null;
+
             const tutorialSteps = [
-                "Hey trainer! Welcome to CardPocket. Collect cards, open packs, battle, and trade. Click Next or X to skip.",
-                "Your Collection holds all your cards. Click any card to view stats. Let's claim your free daily pack!",
-                "Go to Packs tab and click the Free Daily pack. Then click the pack image 3 times to rip it open!",
-                "Earn coins by battling. Use moves to defeat opponents and buy more packs.",
-                "Trade cards with AI trainers or add friends to chat and trade together.",
-                "Test your knowledge with the Quiz or browse the Index. Have fun collecting!"
+                "Welcome to CardPocket! Collect cards, open packs, battle, and trade.",
+                "Your Collection holds your cards. Click any to view details.",
+                "Open packs: choose a pack, then drag the pack image to rip it open!",
+                "Battle with moves to earn coins. Trade with AI or friends.",
+                "Quiz & Index: test your knowledge and browse all Pokémon."
             ];
+            let tutorialStep = 0;
 
-            function saveGame() {
-                localStorage.setItem('cardpocket_save', JSON.stringify({
-                    coins,
-                    trainer: trainerName,
-                    collection: Array.from(collection),
-                    friends,
-                    messages
-                }));
+            function save() { localStorage.setItem('cardpocket', JSON.stringify({ coins, trainer, collection: [...collection],
+                    friends, messages })); }
+
+            function load() {
+                const s = localStorage.getItem('cardpocket');
+                if (s) try {
+                    const d = JSON.parse(s);
+                    coins = d.coins || 500;
+                    trainer = d.trainer || 'Trainer';
+                    collection.clear();
+                    (d.collection || []).forEach(id => collection.add(id));
+                    friends = d.friends || [];
+                    messages = d.messages || {};
+                } catch (e) {}
             }
 
-            function loadGame() {
-                const s = localStorage.getItem('cardpocket_save');
-                if (s) {
-                    try {
-                        const d = JSON.parse(s);
-                        coins = d.coins || 500;
-                        trainerName = d.trainer || 'Trainer';
-                        collection.clear();
-                        (d.collection || []).forEach(id => collection.add(id));
-                        friends = d.friends || [];
-                        messages = d.messages || {};
-                    } catch (e) {}
-                }
-            }
+            function updateCoins() { document.getElementById('coin-balance').textContent = coins;
+                save(); }
 
-            function updateCoins() {
-                document.getElementById('coin-balance').textContent = coins;
-                saveGame();
-            }
-
-            function canClaimFree() {
-                const last = localStorage.getItem('cardpocket_lastFree');
-                if (!last) return true;
-                return (Date.now() - parseInt(last)) > 86400000;
-            }
-
-            function claimFreePack() {
-                if (!canClaimFree()) return alert('Free pack already claimed today!');
-                localStorage.setItem('cardpocket_last', Date.now().toString());
-                openPack({ cost: 0, cards: 3, w: { C: 65, U: 22, R: 10, UR: 2, L: 1 } });
-            }
-
-            function getRarity(bst) {
-                if (bst >= 600) return { name: 'Legendary', cls: 'rarity-legendary' };
-                if (bst >= 550) return { name: 'Ultra Rare', cls: 'rarity-ultrarare' };
-                if (bst >= 450) return { name: 'Rare', cls: 'rarity-rare' };
-                if (bst >= 350) return { name: 'Uncommon', cls: 'rarity-uncommon' };
-                return { name: 'Common', cls: 'rarity-common' };
+            function rarity(bst) {
+                if (bst >= 600) return 'Hyper Rare';
+                if (bst >= 550) return 'Special Illustration';
+                if (bst >= 450) return 'Ultra Rare';
+                if (bst >= 350) return 'Rare';
+                if (bst >= 250) return 'Uncommon';
+                return 'Common';
             }
 
             async function fetchPokemon(id) {
                 const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+                if (!r.ok) throw new Error('fail');
                 const d = await r.json();
+                const art = d.sprites.other['official-artwork'].front_default;
+                const pixel = d.sprites.front_default;
                 const bst = d.stats.reduce((s, st) => s + st.base_stat, 0);
                 return {
                     id: d.id,
                     name: d.name,
-                    sprite: d.sprites.versions?.['generation-v']?.['black-white']?.front_default || d.sprites.front_default,
+                    art,
+                    pixel,
                     types: d.types.map(t => t.type.name),
-                    stats: { hp: d.stats[0].base_stat, attack: d.stats[1].base_stat, defense: d.stats[2].base_stat,
-                        speed: d.stats[5].base_stat, spatk: d.stats[3].base_stat, spdef: d.stats[4].base_stat },
-                    rarity: getRarity(bst),
-                    fact: `${d.name} is a ${d.types.map(t => t.type.name).join('/')} type. BST: ${bst}.`
+                    stats: d.stats.map(s => s.base_stat),
+                    rarity: rarity(bst),
+                    bst
                 };
             }
 
-            async function loadRange(s, e) {
-                const ps = [];
-                for (let i = s; i <= e; i++) ps.push(fetchPokemon(i));
-                const res = await Promise.all(ps);
-                allPokemon.push(...res);
+            async function loadRange(start, end) {
+                const proms = [];
+                for (let i = start; i <= end; i++) proms.push(fetchPokemon(i).catch(() => null));
+                const res = await Promise.all(proms);
+                allPokemon.push(...res.filter(p => p));
             }
 
-            function createCard(p) {
+            function createCard(pokemon) {
                 const c = document.createElement('div');
                 c.className = 'pokemon-card';
-                c.innerHTML = `<div class="card-sprite"><img src="${p.sprite}" alt="${p.name}"></div>
-                    <div class="card-info"><div class="card-name">${p.name}</div>
-                    <span class="rarity-badge ${p.rarity.cls}">${p.rarity.name}</span>
-                    <div>${p.types.map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}</div></div>`;
-                c.addEventListener('click', () => showDetail(p));
+                c.innerHTML = `<div class="card-art"><img src="${pokemon.art}" alt="${pokemon.name}"></div>
+                <div class="card-info"><div class="card-name">${pokemon.name}</div>
+                <span class="rarity-badge rarity-${pokemon.rarity.toLowerCase().replace(/\s/g,'-')}">${pokemon.rarity}</span>
+                <div>${pokemon.types.map(t=>`<span class="type-badge type-${t}">${t}</span>`).join('')}</div></div>`;
+                c.addEventListener('click', () => showDetail(pokemon));
                 return c;
             }
 
             function renderCollection() {
                 const g = document.getElementById('collection-grid');
                 const owned = allPokemon.filter(p => collection.has(p.id));
-                g.innerHTML = owned.length ? '' : '<p style="color:var(--text-secondary);">No cards yet. Open packs!</p>';
+                g.innerHTML = owned.length ? '' : '<p>No cards yet. Open packs!</p>';
                 owned.forEach(p => g.appendChild(createCard(p)));
-                saveGame();
             }
 
             function showDetail(p) {
-                document.getElementById('modal-sprite').src = p.sprite;
+                document.getElementById('modal-art').src = p.art;
                 document.getElementById('modal-name').textContent = p.name;
-                document.getElementById('modal-types').innerHTML = p.types.map(t =>
-                    `<span class="type-badge type-${t}">${t}</span>`).join('');
-                document.getElementById('modal-hp').textContent = p.stats.hp;
-                document.getElementById('modal-atk').textContent = p.stats.attack;
-                document.getElementById('modal-def').textContent = p.stats.defense;
-                document.getElementById('modal-spatk').textContent = p.stats.spatk;
-                document.getElementById('modal-spdef').textContent = p.stats.spdef;
-                document.getElementById('modal-speed').textContent = p.stats.speed;
-                document.getElementById('modal-fact').textContent = p.fact;
+                document.getElementById('modal-fact').textContent = `${p.rarity} · BST ${p.bst}`;
                 document.getElementById('detail-modal').classList.add('show');
             }
+            document.getElementById('modal-close').addEventListener('click', () => document.getElementById('detail-modal')
+                .classList.remove('show'));
 
-            function closeModal() { document.getElementById('detail-modal').classList.remove('show'); }
-
+            // Pack definitions based on real TCG
             const packTypes = [
-                { name: 'Basic', cost: 100, cards: 3, w: { C: 70, U: 20, R: 8, UR: 2, L: 0 } },
-                { name: 'Great', cost: 300, cards: 5, w: { C: 40, U: 30, R: 20, UR: 8, L: 2 } },
-                { name: 'Ultra', cost: 600, cards: 5, w: { C: 20, U: 25, R: 30, UR: 18, L: 7 } },
-                { name: 'Master', cost: 1200, cards: 5, w: { C: 5, U: 15, R: 30, UR: 30, L: 20 } }
+                { name: 'Scarlet & Violet', cost: 150, cards: 10, energy: true, rates: { Common: 70, Uncommon: 20, Rare: 7,
+                        'Double Rare': 2, 'Ultra Rare': 0.8, 'Illustration Rare': 0.2, 'Special Illustration': 0.1,
+                        'Hyper Rare': 0.02 } },
+                { name: '151', cost: 200, cards: 10, special: true, rates: { Common: 50, Uncommon: 25, Rare: 15,
+                        'Double Rare': 5, 'Ultra Rare': 2, 'Illustration Rare': 1, 'Special Illustration': 0.5,
+                        'Hyper Rare': 0.1 } },
+                { name: 'Trick or Trade', cost: 80, cards: 3, rates: { Common: 90, Uncommon: 8, Rare: 2 } },
+                { name: "McDonald's", cost: 60, cards: 3, rates: { Common: 95, Uncommon: 5 } },
+                { name: 'God Pack (1%)', cost: 500, cards: 5, rates: { 'Ultra Rare': 30, 'Hyper Rare': 70 } }
             ];
 
             function renderPacks() {
                 const s = document.getElementById('pack-selection');
                 s.innerHTML = packTypes.map(p => `
-                    <div class="pack-card" onclick="window.buyPack('${p.name}')">
-                        <div class="pack-icon">${p.name[0]}P</div>
-                        <strong>${p.name} Pack</strong>
-                        <div style="color:var(--gold);">${p.cost} Coins</div>
-                        <div>${p.cards} cards</div>
-                    </div>`).join('');
-                s.innerHTML += `
-                    <div class="pack-card" onclick="window.claimFreePack()" style="border-color:var(--gold);">
-                        <div class="pack-icon">FP</div>
-                        <strong>Free Daily</strong>
-                        <div style="color:var(--gold);">0 Coins</div>
-                        <div>3 cards</div>
-                    </div>`;
+                <div class="pack-card" onclick="window.startPack('${p.name}')">
+                    <div class="pack-icon">${p.name[0]}</div>
+                    <strong>${p.name}</strong><br><small>${p.cost} coins</small>
+                </div>`).join('');
             }
 
-            window.buyPack = function(name) {
+            window.startPack = function(name) {
                 const pack = packTypes.find(p => p.name === name);
                 if (coins < pack.cost) return alert('Not enough coins!');
                 coins -= pack.cost;
                 updateCoins();
-                openPack(pack);
+                currentPack = pack;
+                ripProgress = 0;
+                document.getElementById('pack-rip-area').classList.add('active');
+                document.getElementById('rip-fill').style.width = '0%';
+                document.getElementById('rip-status').textContent = 'Drag the pack!';
+                document.getElementById('pack-flip-container').innerHTML = '';
+                pendingCards = [];
             };
 
-            window.claimFreePack = claimFreePack;
+            const ripImg = document.getElementById('rip-image');
+            ripImg.addEventListener('mousedown', () => {
+                const onMove = (e) => {
+                    e.preventDefault();
+                    ripProgress = Math.min(100, ripProgress + 5);
+                    document.getElementById('rip-fill').style.width = ripProgress + '%';
+                    if (ripProgress >= 100) {
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                        ripComplete();
+                    }
+                };
+                const onUp = () => {
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            ripImg.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const onMove = () => {
+                    ripProgress = Math.min(100, ripProgress + 5);
+                    document.getElementById('rip-fill').style.width = ripProgress + '%';
+                    if (ripProgress >= 100) {
+                        document.removeEventListener('touchmove', onMove);
+                        document.removeEventListener('touchend', onEnd);
+                        ripComplete();
+                    }
+                };
+                const onEnd = () => {
+                    document.removeEventListener('touchmove', onMove);
+                    document.removeEventListener('touchend', onEnd);
+                };
+                document.addEventListener('touchmove', onMove);
+                document.addEventListener('touchend', onEnd);
+            });
 
-            function openPack(pack) {
-                const pool = [...allPokemon];
-                pendingCards = [];
-                for (let i = 0; i < pack.cards; i++) {
-                    const roll = Math.random() * 100;
-                    let rarity = 'C';
-                    let cum = 0;
-                    for (const [r, w] of Object.entries(pack.w)) { cum += w; if (roll <= cum) { rarity = r; break; } }
-                    const cands = pool.filter(p => p.rarity?.name?.[0] === rarity);
-                    const pick = cands.length ? cands[Math.floor(Math.random() * cands.length)] : pool[Math.floor(Math
-                        .random() * pool.length)];
-                    pendingCards.push(pick);
-                    collection.add(pick.id);
-                }
-                ripCount = 0;
-                document.getElementById('rip-counter').textContent = 'Rips: 0/3';
-                document.getElementById('pack-rip-area').classList.add('show');
-                document.getElementById('pack-flip-container').innerHTML = '';
+            function ripComplete() {
+                document.getElementById('pack-rip-area').classList.remove('active');
+                generatePackCards();
             }
 
-            document.getElementById('rip-image').addEventListener('click', function() {
-                ripCount++;
-                document.getElementById('rip-counter').textContent = 'Rips: ' + ripCount + '/3';
-                if (ripCount >= 3) {
-                    document.getElementById('pack-rip-area').classList.remove('show');
-                    revealCards();
+            function generatePackCards() {
+                const pool = [...allPokemon];
+                const cards = [];
+                const pack = currentPack;
+                const total = pack.cards + (pack.energy ? 1 : 0);
+                for (let i = 0; i < total; i++) {
+                    if (pack.energy && i === total - 1) {
+                        cards.push({ name: 'Energy', art: '⚡', rarity: 'Common' });
+                        continue;
+                    }
+                    const roll = Math.random() * 100;
+                    let cum = 0;
+                    let rarity = 'Common';
+                    for (const [r, w] of Object.entries(pack.rates)) { cum += w; if (roll <= cum) { rarity = r; break; } }
+                    const cands = pool.filter(p => p.rarity === rarity);
+                    const pick = cands.length ? cands[Math.floor(Math.random() * cands.length)] : pool[Math.floor(Math
+                        .random() * pool.length)];
+                    cards.push(pick);
+                    collection.add(pick.id);
                 }
-            });
+                pendingCards = cards;
+                revealCards();
+            }
 
             function revealCards() {
                 const c = document.getElementById('pack-flip-container');
                 c.innerHTML = '';
-                pendingCards.forEach((p, i) => {
+                pendingCards.forEach((card, i) => {
                     const fc = document.createElement('div');
                     fc.className = 'flip-card';
-                    fc.innerHTML = `<div class="flip-card-inner"><div class="flip-card-back">?</div>
-                        <div class="flip-card-front"><img src="${p.sprite}"><strong>${p.name}</strong>
-                        <span class="rarity-badge ${p.rarity.cls}">${p.rarity.name}</span></div></div>`;
+                    const isEnergy = card.name === 'Energy';
+                    fc.innerHTML = `<div class="flip-card-inner">
+                    <div class="flip-back">?</div>
+                    <div class="flip-front">
+                        ${isEnergy ? '<div style="font-size:3rem;">⚡</div><strong>Energy</strong>' : `<img src="${card.art}" alt="${card.name}"><strong>${card.name}</strong><span class="rarity-badge rarity-${card.rarity.toLowerCase().replace(/\s/g,'-')}">${card.rarity}</span>`}
+                    </div></div>`;
                     c.appendChild(fc);
                     setTimeout(() => fc.classList.add('flipped'), 400 * (i + 1));
                 });
@@ -898,73 +789,63 @@
 
             function startBattle() {
                 const owned = allPokemon.filter(p => collection.has(p.id));
-                if (!owned.length) return alert('Need cards to battle!');
+                if (!owned.length) return alert('Need cards!');
                 const pl = owned[Math.floor(Math.random() * owned.length)];
                 const op = allPokemon[Math.floor(Math.random() * allPokemon.length)];
-                currentBattle = { player: { ...pl, hp: pl.stats.hp, mx: pl.stats.hp }, opponent: { ...op, hp: op.stats
-                        .hp, mx: op.stats.hp }, pmoves: genMoves(pl), omoves: genMoves(op) };
+                battle = { player: { ...pl, hp: pl.stats[0], maxHp: pl.stats[0] }, opponent: { ...op, hp: op.stats[0],
+                        maxHp: op.stats[0] }, pmoves: genMoves(pl), omoves: genMoves(op) };
                 renderBattle();
             }
 
             function renderBattle() {
-                if (!currentBattle) return document.getElementById('battle-screen').innerHTML = '';
-                const b = currentBattle;
+                if (!battle) return;
+                const b = battle;
                 document.getElementById('battle-screen').innerHTML = `
-                    <div class="battle-pokemon"><h3>Opponent ${b.opponent.name}</h3>
-                        <img src="${b.opponent.sprite}" style="width:110px;"><div class="hp-bar">
-                        <div class="hp-fill" style="width:${(b.opponent.hp/b.opponent.mx)*100}%"></div></div>
-                        <p>HP: ${b.opponent.hp}/${b.opponent.mx}</p></div>
-                    <div class="battle-pokemon"><h3>Your ${b.player.name}</h3>
-                        <img src="${b.player.sprite}" style="width:110px;"><div class="hp-bar">
-                        <div class="hp-fill" style="width:${(b.player.hp/b.player.mx)*100}%"></div></div>
-                        <p>HP: ${b.player.hp}/${b.player.mx}</p>
-                        ${b.pmoves.map((m,i) => `<button class="move-btn" data-mi="${i}">${m}</button>`).join('')}</div>`;
-                document.querySelectorAll('.move-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const mi = parseInt(this.dataset.mi);
-                        executeMove(mi);
-                    });
-                });
+                <div class="battle-pokemon">
+                    <h3>Opponent ${b.opponent.name}</h3><img src="${b.opponent.art}" width="110">
+                    <div class="hp-bar"><div class="hp-fill" style="width:${(b.opponent.hp/b.opponent.maxHp)*100}%"></div></div>
+                    HP: ${b.opponent.hp}/${b.opponent.maxHp}
+                </div>
+                <div class="battle-pokemon">
+                    <h3>Your ${b.player.name}</h3><img src="${b.player.art}" width="110">
+                    <div class="hp-bar"><div class="hp-fill" style="width:${(b.player.hp/b.player.maxHp)*100}%"></div></div>
+                    HP: ${b.player.hp}/${b.player.maxHp}
+                    ${b.pmoves.map((m,i) => `<button class="move-btn" onclick="window.useMove(${i})">${m}</button>`).join('')}
+                </div>`;
             }
 
-            function executeMove(mi) {
-                if (!currentBattle) return;
-                const b = currentBattle;
+            window.useMove = function(i) {
+                if (!battle) return;
+                const b = battle;
                 b.opponent.hp = Math.max(0, b.opponent.hp - (Math.floor(Math.random() * 20) + 10));
-                if (b.opponent.hp <= 0) {
-                    const rw = Math.floor(Math.random() * 30) + 20;
-                    coins += rw;
+                if (b.opponent.hp <= 0) { coins += 40;
                     updateCoins();
-                    alert('You won! +' + rw + ' Coins');
-                    currentBattle = null;
-                    document.getElementById('battle-screen').innerHTML = '';
-                    return;
-                }
-                b.player.hp = Math.max(0, b.player.hp - (Math.floor(Math.random() * 20) + 5));
+                    alert('You won! +40 coins');
+                    battle = null;
+                    document.getElementById('battle-screen').innerHTML = ''; return; }
+                b.player.hp = Math.max(0, b.player.hp - (Math.floor(Math.random() * 15) + 5));
                 if (b.player.hp <= 0) { alert('You lost!');
-                    currentBattle = null;
+                    battle = null;
                     document.getElementById('battle-screen').innerHTML = ''; return; }
                 renderBattle();
-            }
+            };
 
             // Trades
             function genOffers() {
-                if (!collection.size) return document.getElementById('offers-container').innerHTML =
-                    '<p>No cards to trade.</p>';
-                const names = ['Red', 'Blue', 'Green', 'Silver', 'Diamond'];
+                if (!collection.size) return document.getElementById('offers-container').innerHTML = '<p>No cards.</p>';
+                const names = ['Red', 'Blue', 'Green'];
                 const offs = [];
                 for (let i = 0; i < 3; i++) {
-                    const rid = Array.from(collection)[Math.floor(Math.random() * collection.size)];
+                    const rid = [...collection][Math.floor(Math.random() * collection.size)];
                     const off = allPokemon[Math.floor(Math.random() * allPokemon.length)];
                     if (rid === off.id) continue;
-                    offs.push({ trainer: names[Math.floor(Math.random() * names.length)], req: allPokemon.find(p => p
-                            .id === rid), off });
+                    offs.push({ trainer: names[i % names.length], req: allPokemon.find(p => p.id === rid), off });
                 }
                 document.getElementById('offers-container').innerHTML = offs.map(o => `
-                    <div class="trade-offer"><strong>${o.trainer}</strong> wants ${o.req.name}
-                        <img src="${o.req.sprite}" width="45"> &rarr; <img src="${o.off.sprite}" width="45"> ${o.off.name}
-                        <button class="btn btn-accept" data-r="${o.req.id}" data-o="${o.off.id}">Accept</button>
-                        <button class="btn btn-decline">Decline</button></div>`).join('');
+                <div class="trade-offer"><strong>${o.trainer}</strong> wants ${o.req.name}
+                <img src="${o.req.art}" width="50"> &rarr; <img src="${o.off.art}" width="50"> ${o.off.name}
+                <button class="btn btn-accept" data-r="${o.req.id}" data-o="${o.off.id}">Accept</button>
+                <button class="btn btn-decline">Decline</button></div>`).join('');
                 document.querySelectorAll('.btn-accept').forEach(b => b.addEventListener('click', function() {
                     const ri = +this.dataset.r,
                         oi = +this.dataset.o;
@@ -976,41 +857,38 @@
                 document.querySelectorAll('.btn-decline').forEach(b => b.addEventListener('click', genOffers));
             }
 
-            // Friends
             function addFriend() {
-                const n = document.getElementById('friend-name-input').value.trim();
+                const n = document.getElementById('friend-input').value.trim();
                 if (!n || friends.includes(n)) return;
                 friends.push(n);
-                document.getElementById('friend-name-input').value = '';
-                saveGame();
+                document.getElementById('friend-input').value = '';
                 renderFriends();
+                save();
             }
 
             function renderFriends() {
                 const l = document.getElementById('friend-list');
-                l.innerHTML = friends.map(f => `
-                    <div class="friend-entry"><span>${f}</span><div style="display:flex;gap:8px;">
-                        <button class="btn btn-primary" data-f="${f}" onclick="window.chatWith('${f}')">Chat</button>
-                        <button class="btn btn-gold" data-f="${f}" onclick="window.tradeWith('${f}')">Trade</button>
-                    </div></div>`).join('') || '<p>No friends added.</p>';
+                l.innerHTML = friends.map(f => `<div class="friend-entry"><span>${f}</span>
+                <button class="btn btn-primary" onclick="window.chat('${f}')">Chat</button>
+                <button class="btn btn-gold" onclick="window.tradeFriend('${f}')">Trade</button></div>`).join(
+                '') || '<p>No friends.</p>';
             }
 
-            window.chatWith = function(f) {
+            window.chat = function(f) {
                 const cw = document.getElementById('chat-window');
                 const ms = messages[f] || [];
                 cw.innerHTML = ms.map(m => `<div><strong>${m.from}:</strong> ${m.text}</div>`).join('') +
-                    `<div style="display:flex;gap:8px;margin-top:10px;"><input id="ci" placeholder="Message..." style="flex:1;padding:8px;border-radius:16px;background:var(--bg);border:1px solid var(--border);color:var(--text);"><button class="btn btn-primary" id="sb">Send</button></div>`;
+                    `<div><input id="ci" placeholder="Message..."><button id="sb">Send</button></div>`;
                 document.getElementById('sb').addEventListener('click', () => {
                     const t = document.getElementById('ci').value.trim();
                     if (!t) return;
                     if (!messages[f]) messages[f] = [];
-                    messages[f].push({ from: trainerName, text: t });
-                    saveGame();
-                    window.chatWith(f);
+                    messages[f].push({ from: trainer, text: t });
+                    save();
+                    window.chat(f);
                 });
             };
-
-            window.tradeWith = function(f) {
+            window.tradeFriend = function(f) {
                 const owned = allPokemon.filter(p => collection.has(p.id));
                 if (!owned.length) return alert('No cards.');
                 const r = owned[Math.floor(Math.random() * owned.length)];
@@ -1019,43 +897,37 @@
                 if (confirm(`Offer ${f} your ${r.name} for ${o.name}?`)) alert('Trade sent!');
             };
 
-            // Quiz
             function renderQuiz() {
                 if (!allPokemon.length) return;
                 const p = allPokemon[Math.floor(Math.random() * allPokemon.length)];
-                const qs = [{ q: `What type is ${p.name}?`, a: p.types[0], opts: ['water', 'fire', 'grass', 'normal'] },
-                { q: `What's ${p.name}'s base HP?`, a: p.stats.hp.toString(), opts: ['50', '60', '70', '80'] }];
-                const q = qs[Math.floor(Math.random() * qs.length)];
-                const opts = [...new Set([q.a, ...q.opts.filter(o => o !== q.a)].slice(0, 4))].sort(() => Math.random() -
-                    0.5);
-                document.getElementById('quiz-container').innerHTML = `<h3>${q.q}</h3>` + opts.map(o =>
-                    `<button class="quiz-option">${o}</button>`).join('');
-                document.querySelectorAll('.quiz-option').forEach(b => b.addEventListener('click', function() {
-                    if (this.textContent === q.a) alert('Correct!');
-                    else alert('Wrong! Answer: ' + q.a);
-                    renderQuiz();
-                }));
+                const q = [`What type is ${p.name}?`, p.types[0]];
+                document.getElementById('quiz-container').innerHTML = `<h3>${q[0]}</h3>
+                <button class="quiz-option">${q[1]}</button><button class="quiz-option">???</button>`;
+                document.querySelectorAll('.quiz-option')[0].addEventListener('click', () => { alert('Correct!');
+                    renderQuiz(); });
+                document.querySelectorAll('.quiz-option')[1].addEventListener('click', () => { alert('Wrong!');
+                    renderQuiz(); });
             }
 
-            // Index
             function renderIndex() {
                 document.getElementById('index-body').innerHTML = allPokemon.map(p => `
-                    <tr><td>#${p.id}</td><td style="text-transform:capitalize;color:var(--gold);cursor:pointer" onclick="window.showIdx(${p.id})">${p.name}</td>
-                    <td>${p.types.map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}</td>
-                    <td><span class="rarity-badge ${p.rarity.cls}">${p.rarity.name}</span></td></tr>`).join('');
+                <tr><td>#${p.id}</td><td style="text-transform:capitalize;">${p.name}</td>
+                <td>${p.types.map(t=>`<span class="type-badge type-${t}">${t}</span>`).join('')}</td>
+                <td><img src="${p.pixel}" width="40" height="40"></td></tr>`).join('');
             }
-            window.showIdx = function(id) { const p = allPokemon.find(p => p.id === id); if (p) showDetail(p); };
 
             async function loadAll() {
-                const btn = document.getElementById('load-all-btn');
-                btn.disabled = true;
-                btn.textContent = 'Loading...';
-                for (let i = 152; i <= 898; i += 100) { await loadRange(i, Math.min(i + 99, 898)); }
+                document.getElementById('load-all-btn').disabled = true;
+                document.getElementById('load-all-btn').textContent = 'Loading...';
+                // Load all species + forms (up to 1164)
+                for (let i = 1; i <= 1025; i++) await loadRange(i, i);
+                // Additional forms (Alola, Galar, etc.)
+                for (let i = 10001; i <= 10249; i++) await loadRange(i, i);
+                for (let i = 10100; i <= 10177; i++) await loadRange(i, i);
                 renderIndex();
-                btn.textContent = 'All Loaded!';
+                document.getElementById('load-all-btn').textContent = 'All Loaded!';
             }
 
-            // Tab switching
             function switchTab(tab) {
                 document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('visible'));
                 document.getElementById('tab-' + tab).classList.add('visible');
@@ -1069,61 +941,44 @@
                 if (tab === 'index') renderIndex();
             }
 
-            // Tutorial
-            function updateTut() {
-                document.getElementById('tutorial-text').textContent = tutorialSteps[tutorialStep];
-                document.getElementById('tutorial-prev').style.visibility = tutorialStep === 0 ? 'hidden' : 'visible';
-                document.getElementById('tutorial-next').textContent = tutorialStep === tutorialSteps.length - 1 ?
-                    'Finish' : 'Next';
+            function tutorial() {
+                const update = () => {
+                    document.getElementById('tutorial-text').textContent = tutorialSteps[tutorialStep];
+                    document.getElementById('tutorial-prev').style.visibility = tutorialStep === 0 ? 'hidden' :
+                        'visible';
+                };
+                update();
+                document.getElementById('tutorial').classList.remove('hidden');
+                document.getElementById('tutorial-next').onclick = () => { if (tutorialStep < tutorialSteps.length -
+                        1) { tutorialStep++;
+                        update(); } else document.getElementById('tutorial').classList.add('hidden'); };
+                document.getElementById('tutorial-prev').onclick = () => { if (tutorialStep > 0) { tutorialStep--;
+                        update(); } };
+                document.getElementById('tutorial-close').onclick = () => document.getElementById('tutorial').classList
+                    .add('hidden');
             }
 
-            function startTutorial() {
-                tutorialStep = 0;
-                updateTut();
-                document.getElementById('tutorial-overlay').classList.remove('hidden');
-            }
-
-            function closeTutorial() {
-                document.getElementById('tutorial-overlay').classList.add('hidden');
-                localStorage.setItem('cardpocket_tutorial', 'true');
-            }
-
-            function nextTutorial() {
-                if (tutorialStep < tutorialSteps.length - 1) { tutorialStep++;
-                    updateTut(); } else closeTutorial();
-                if (tutorialStep === 2) switchTab('packs');
-            }
-
-            // Init
             async function init() {
-                loadGame();
-                document.getElementById('trainer-name-input').value = trainerName;
+                load();
+                document.getElementById('trainer-input').value = trainer;
                 updateCoins();
-                document.getElementById('collection-grid').innerHTML =
-                '<p style="color:var(--text-secondary);">Loading Pokémon...</p>';
+                document.getElementById('collection-grid').innerHTML = '<p>Loading Pokémon...</p>';
                 await loadRange(1, 151);
                 renderCollection();
                 renderPacks();
                 renderFriends();
-                document.getElementById('save-trainer-btn').addEventListener('click', () => {
-                    trainerName = document.getElementById('trainer-name-input').value.trim() || 'Trainer';
-                    saveGame();
+                document.getElementById('save-trainer').addEventListener('click', () => {
+                    trainer = document.getElementById('trainer-input').value.trim() || 'Trainer';
+                    save();
                 });
-                document.getElementById('modal-close').addEventListener('click', closeModal);
-                document.getElementById('detail-modal').addEventListener('click', function(e) { if (e.target === this)
-                        closeModal(); });
                 document.getElementById('find-battle-btn').addEventListener('click', startBattle);
-                document.getElementById('refresh-offers-btn').addEventListener('click', genOffers);
-                document.getElementById('add-friend-btn').addEventListener('click', addFriend);
+                document.getElementById('refresh-offers').addEventListener('click', genOffers);
+                document.getElementById('add-friend').addEventListener('click', addFriend);
                 document.getElementById('load-all-btn').addEventListener('click', loadAll);
-                document.getElementById('tutorial-next').addEventListener('click', nextTutorial);
-                document.getElementById('tutorial-prev').addEventListener('click', () => { if (tutorialStep > 0) {
-                        tutorialStep--;
-                        updateTut(); } });
-                document.getElementById('tutorial-close-btn').addEventListener('click', closeTutorial);
-                document.querySelectorAll('.nav-btn[data-tab]').forEach(b => b.addEventListener('click', function() {
-                    switchTab(this.dataset.tab); }));
-                if (!localStorage.getItem('cardpocket_tutorial')) startTutorial();
+                document.querySelectorAll('.nav-btn[data-tab]').forEach(b => b.addEventListener('click', () => switchTab(b
+                    .dataset.tab)));
+                if (!localStorage.getItem('cardpocket_tutorial')) { tutorial();
+                    localStorage.setItem('cardpocket_tutorial', 'true'); }
             }
             init();
         })();
