@@ -2,66 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CardPocket – Collect, Battle & Trade</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>PocketCollect · Pokémon TCG</title>
     <style>
-        :root {
-            --bg: #1e1e2a;
-            --surface: #2a2a3a;
-            --card-bg: #3a3a50;
-            --text: #f0f0f5;
-            --text-secondary: #b0b0c0;
-            --accent: #c47a5a;
-            --gold: #c9a96e;
-            --green: #6b8e6a;
-            --blue: #5a7a8a;
-            --border: rgba(255, 255, 255, 0.08);
-            --radius: 14px;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
         body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: #1a1a24;
+            color: #fff;
             min-height: 100vh;
-            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
         }
-        .header {
-            background: var(--surface);
-            border-bottom: 2px solid var(--gold);
-            padding: 14px 28px;
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e1e2a 0%, #12121a 100%);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.6);
+        }
+        header {
+            background: #c44536;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow);
+            border-bottom: 3px solid #f1c40f;
         }
         .logo {
             display: flex;
             align-items: center;
             gap: 10px;
             font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--gold);
+            font-size: 1.4rem;
+            color: #f1c40f;
+            text-shadow: 1px 1px 2px black;
         }
-        .pokeball {
-            width: 38px;
-            height: 38px;
-            background: conic-gradient(#c47a5a 0% 50%, white 50% 100%);
+        .pokeball-icon {
+            width: 34px;
+            height: 34px;
+            background: conic-gradient(#fff 0% 50%, #c44536 50% 100%);
             border-radius: 50%;
             border: 3px solid #333;
             position: relative;
         }
-        .pokeball::after {
+        .pokeball-icon::after {
             content: '';
             position: absolute;
             width: 12px;
@@ -73,315 +69,133 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-        .trainer-box {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--bg);
-            border-radius: 25px;
-            padding: 5px 5px 5px 16px;
-            border: 1px solid var(--border);
-        }
-        .trainer-box input {
-            background: transparent;
-            border: none;
-            color: var(--text);
-            font-size: 0.9rem;
-            width: 120px;
-            outline: none;
-        }
-        .trainer-box button {
-            padding: 7px 18px;
-            border-radius: 20px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-        .coins {
-            background: var(--bg);
-            padding: 8px 18px;
-            border-radius: 25px;
-            border: 1px solid var(--border);
-            font-weight: 700;
+        .coin-display {
+            background: #2a2a3a;
+            border-radius: 30px;
+            padding: 6px 16px;
             display: flex;
             align-items: center;
             gap: 6px;
+            font-weight: 700;
+            border: 1px solid #f1c40f;
         }
         .coin-icon {
-            display: inline-block;
             width: 20px;
             height: 20px;
-            background: var(--gold);
+            background: #f1c40f;
             border-radius: 50%;
-            border: 2px solid #fff3cd;
+            border: 2px solid #fff;
         }
-        .nav-tabs {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 15px 80px;
         }
-        .nav-btn {
-            padding: 9px 20px;
-            border-radius: 22px;
-            background: transparent;
-            border: 2px solid transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.85rem;
-            transition: 0.2s;
-            white-space: nowrap;
-        }
-        .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.06);
-            color: var(--text);
-        }
-        .nav-btn.active {
-            background: var(--accent);
-            color: white;
-        }
-        .main-content {
-            padding: 24px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        .tab-view {
+        .tab-content {
             display: none;
         }
-        .tab-view.visible {
+        .tab-content.active {
             display: block;
         }
-        .card-grid {
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
         }
-        .pokemon-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
+        .card-item {
+            background: #2d2d44;
+            border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.2s;
-            border: 2px solid var(--border);
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .card-item:hover {
+            transform: scale(1.03);
+        }
+        .card-item img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+        .card-item .card-name {
+            padding: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
             text-align: center;
+            background: #3a3a55;
         }
-        .pokemon-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--gold);
-        }
-        .card-art {
-            height: 140px;
+        .set-selector {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.3);
-        }
-        .card-art img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-        .card-info {
-            padding: 10px;
-        }
-        .card-name {
-            font-weight: 800;
-            text-transform: capitalize;
-            font-size: 0.9rem;
-        }
-        .rarity-badge {
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 10px;
-            display: inline-block;
-            margin: 4px 0;
-        }
-        .rarity-common {
-            background: #7a7a8c;
-            color: white;
-        }
-        .rarity-uncommon {
-            background: var(--green);
-            color: white;
-        }
-        .rarity-rare {
-            background: var(--blue);
-            color: white;
-        }
-        .rarity-double-rare {
-            background: #d4a843;
-            color: #1a1a24;
-        }
-        .rarity-ultra-rare {
-            background: #8a7a8a;
-            color: white;
-        }
-        .rarity-illustration-rare {
-            background: #e5905c;
-            color: white;
-        }
-        .rarity-special-illustration {
-            background: linear-gradient(135deg, #c47a5a, #f0d060);
-            color: #1a1a24;
-        }
-        .rarity-hyper-rare {
-            background: #b8923b;
-            color: white;
-        }
-        .type-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: capitalize;
-            margin: 2px;
-            color: #1a1a24;
-        }
-        .type-grass {
-            background: #78c850;
-        }
-        .type-fire {
-            background: #f08030;
-        }
-        .type-water {
-            background: #6890f0;
-        }
-        .type-electric {
-            background: #f8d030;
-        }
-        .type-psychic {
-            background: #f85888;
-        }
-        .type-dragon {
-            background: #7038f8;
-            color: white;
-        }
-        .type-normal {
-            background: #a8a878;
-        }
-        .type-fighting {
-            background: #c03028;
-            color: white;
-        }
-        .type-dark {
-            background: #705848;
-            color: white;
-        }
-        .type-steel {
-            background: #b8b8d0;
-        }
-        .type-ice {
-            background: #98d8d8;
-        }
-        .type-poison {
-            background: #a040a0;
-            color: white;
-        }
-        .type-ground {
-            background: #e0c068;
-        }
-        .type-flying {
-            background: #a890f0;
-        }
-        .type-bug {
-            background: #a8b820;
-        }
-        .type-rock {
-            background: #b8a038;
-        }
-        .type-ghost {
-            background: #705898;
-            color: white;
-        }
-        .type-fairy {
-            background: #ee99ac;
-        }
-        .pack-grid {
-            display: flex;
-            gap: 16px;
             flex-wrap: wrap;
-            margin-bottom: 24px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
-        .pack-card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 20px;
-            text-align: center;
-            border: 2px solid var(--border);
-            width: 170px;
+        .set-btn {
+            background: #2a2a3a;
+            border: 2px solid #f1c40f;
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #f1c40f;
+            font-weight: 700;
             cursor: pointer;
             transition: 0.2s;
-            user-select: none;
         }
-        .pack-card:hover {
-            border-color: var(--gold);
+        .set-btn.active {
+            background: #f1c40f;
+            color: #1a1a24;
         }
-        .pack-icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        .pack-rip-area {
-            text-align: center;
+        .pack-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             margin: 20px 0;
-            display: none;
         }
-        .pack-rip-area.active {
-            display: block;
-        }
-        .rip-image {
-            width: 200px;
+        .pack-rip-img {
+            width: 180px;
             cursor: grab;
             transition: 0.2s;
             user-select: none;
         }
-        .rip-image:active {
+        .pack-rip-img:active {
             cursor: grabbing;
         }
-        .rip-bar {
-            width: 60%;
-            height: 12px;
-            background: #444;
-            border-radius: 6px;
-            margin: 16px auto;
+        .progress-bar {
+            width: 80%;
+            height: 14px;
+            background: #333;
+            border-radius: 10px;
+            margin: 20px 0;
             overflow: hidden;
         }
-        .rip-fill {
+        .progress-fill {
             height: 100%;
-            background: var(--accent);
             width: 0%;
+            background: #f1c40f;
             transition: width 0.1s;
         }
         .flip-container {
             display: flex;
-            gap: 16px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-top: 20px;
+            gap: 15px;
         }
         .flip-card {
-            width: 150px;
-            height: 210px;
+            width: 140px;
+            height: 200px;
             perspective: 800px;
-            cursor: pointer;
         }
-        .flip-card-inner {
+        .flip-inner {
             position: relative;
             width: 100%;
             height: 100%;
             transition: transform 0.5s;
             transform-style: preserve-3d;
         }
-        .flip-card.flipped .flip-card-inner {
+        .flip-card.flipped .flip-inner {
             transform: rotateY(180deg);
         }
-        .flip-front,
-        .flip-back {
+        .flip-front, .flip-back {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -392,593 +206,502 @@
             justify-content: center;
         }
         .flip-back {
-            background: linear-gradient(145deg, #4a4a5c, #3a3a4a);
-            border: 2px solid var(--gold);
+            background: #c44536;
+            border: 2px solid #f1c40f;
             font-size: 2rem;
-            color: var(--gold);
         }
         .flip-front {
-            background: var(--card-bg);
+            background: #2d2d44;
             transform: rotateY(180deg);
             flex-direction: column;
-            padding: 8px;
-            border: 1px solid var(--border);
-            text-align: center;
+            border: 1px solid #555;
         }
         .flip-front img {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
+            width: 100%;
+            height: auto;
+            border-radius: 8px 8px 0 0;
         }
-        .trade-offer {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 16px;
-            margin-bottom: 12px;
+        .flip-front .rarity {
+            padding: 5px;
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+        .battle-box {
             display: flex;
+            gap: 20px;
+            justify-content: center;
             align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            border: 2px solid var(--border);
+            margin: 20px 0;
         }
-        .btn {
-            padding: 9px 22px;
-            border-radius: 22px;
+        .battle-card {
+            background: #2d2d44;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            width: 160px;
+        }
+        .battle-card img {
+            width: 100%;
+            height: auto;
+        }
+        .hp-bar {
+            background: #555;
+            height: 10px;
+            border-radius: 5px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+        .hp-fill {
+            height: 100%;
+            background: #4caf50;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .move-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 4px 0;
+            background: #3b4cca;
+            color: white;
             border: none;
+            border-radius: 20px;
             font-weight: 700;
             cursor: pointer;
-            font-size: 0.85rem;
+        }
+        .trade-offer {
+            background: #2a2a3a;
+            border: 1px solid #f1c40f;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #2d2d44;
+            border-radius: 18px;
+            padding: 20px;
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+            border: 2px solid #f1c40f;
+            position: relative;
+        }
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 500px;
+            background: #1e1e2a;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 2px solid #f1c40f;
+            z-index: 99;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #888;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
             transition: 0.2s;
         }
-        .btn-primary {
-            background: var(--accent);
-            color: white;
+        .nav-item.active {
+            color: #f1c40f;
         }
-        .btn-accept {
-            background: var(--green);
-            color: white;
+        .nav-item span {
+            font-size: 1.4rem;
+            margin-bottom: 2px;
         }
-        .btn-decline {
-            background: #6e6e6e;
-            color: white;
-        }
-        .btn-gold {
-            background: var(--gold);
-            color: #1a1a24;
-        }
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 200;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-overlay.show {
-            display: flex;
-        }
-        .modal-panel {
-            background: var(--surface);
-            border-radius: 18px;
-            padding: 28px;
-            max-width: 440px;
-            width: 90%;
-            text-align: center;
-            border: 2px solid var(--gold);
-        }
-        .tutorial-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 300;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .tutorial-overlay.hidden {
-            display: none;
-        }
-        .tutorial-box {
-            background: var(--surface);
-            border-radius: 22px;
-            padding: 36px;
-            max-width: 550px;
-            width: 90%;
-            text-align: center;
-            border: 2px solid var(--gold);
-        }
-        .index-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            background: var(--surface);
-            border-radius: var(--radius);
-        }
-        .index-table th,
-        .index-table td {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
+        button {
+            touch-action: manipulation;
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="logo"><div class="pokeball"></div>CardPocket</div>
-        <div class="trainer-box">
-            <input type="text" id="trainer-input" placeholder="Trainer name" maxlength="14" value="Trainer">
-            <button id="save-trainer">Save</button>
-        </div>
-        <div class="coins"><span class="coin-icon"></span> <span id="coin-balance">500</span> Coins</div>
-        <nav class="nav-tabs" id="nav-tabs">
-            <button class="nav-btn active" data-tab="collection">Collection</button>
-            <button class="nav-btn" data-tab="packs">Packs</button>
-            <button class="nav-btn" data-tab="battle">Battle</button>
-            <button class="nav-btn" data-tab="trades">Trades</button>
-            <button class="nav-btn" data-tab="friends">Friends</button>
-            <button class="nav-btn" data-tab="learn">Quiz</button>
-            <button class="nav-btn" data-tab="index">Index</button>
-        </nav>
-    </header>
-
-    <main class="main-content">
-        <div class="tab-view visible" id="tab-collection"><h2>My Collection</h2><div class="card-grid" id="collection-grid"></div></div>
-        <div class="tab-view" id="tab-packs">
-            <h2>Booster Packs</h2>
-            <div class="pack-grid" id="pack-selection"></div>
-            <div class="pack-rip-area" id="pack-rip-area">
-                <h3>Drag to rip open!</h3>
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Crect x='10' y='10' width='80' height='120' rx='10' fill='%234a4a5c' stroke='%23c9a96e' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23c47a5a' stroke='%23333' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='8' fill='white' stroke='%23333' stroke-width='2'/%3E%3Ctext x='50' y='100' text-anchor='middle' fill='%23c9a96e' font-size='14' font-weight='bold'%3EPACK%3C/text%3E%3C/svg%3E" class="rip-image" id="rip-image" alt="Pack">
-                <div class="rip-bar"><div class="rip-fill" id="rip-fill"></div></div>
-                <p id="rip-status">Drag the pack!</p>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <div class="pokeball-icon"></div>
+                PocketCollect
             </div>
-            <div class="flip-container" id="pack-flip-container"></div>
-        </div>
-        <div class="tab-view" id="tab-battle"><h2>Arena Battle</h2><div class="battle-screen" id="battle-screen"></div><button class="btn btn-primary" id="find-battle-btn">Find Opponent</button></div>
-        <div class="tab-view" id="tab-trades"><h2>Trade Offers</h2><div id="offers-container"></div><button class="btn btn-gold" id="refresh-offers">Refresh</button></div>
-        <div class="tab-view" id="tab-friends"><h2>Friends & Chat</h2><div><input id="friend-input" placeholder="Friend name"><button class="btn btn-primary" id="add-friend">Add</button></div><div class="friend-list" id="friend-list"></div><div class="chat-window" id="chat-window"></div></div>
-        <div class="tab-view" id="tab-learn"><h2>Quiz</h2><div id="quiz-container"></div></div>
-        <div class="tab-view" id="tab-index"><h2>Pokédex Index</h2><button class="btn btn-primary" id="load-all-btn">Load All 1,164 Pokémon</button><table class="index-table"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Art</th></tr></thead><tbody id="index-body"></tbody></table></div>
-    </main>
+            <div class="coin-display">
+                <div class="coin-icon"></div>
+                <span id="coin-balance">500</span>
+            </div>
+        </header>
+        <main>
+            <div class="tab-content active" id="tab-collection">
+                <h2>📚 My Collection</h2>
+                <div class="grid" id="collection-grid"></div>
+            </div>
+            <div class="tab-content" id="tab-packs">
+                <h2>🎴 Open Packs</h2>
+                <div class="set-selector" id="set-selector"></div>
+                <div class="pack-area" id="pack-rip-area">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Crect x='10' y='10' width='80' height='120' rx='10' fill='%23c44536' stroke='%23f1c40f' stroke-width='4'/%3E%3Ccircle cx='50' cy='50' r='22' fill='white' stroke='%23333' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='9' fill='white' stroke='%23333' stroke-width='2'/%3E%3Ctext x='50' y='100' text-anchor='middle' fill='%23f1c40f' font-size='16' font-weight='bold'%3EPACK%3C/text%3E%3C/svg%3E" class="pack-rip-img" id="pack-rip-img" alt="Pack">
+                    <div class="progress-bar"><div class="progress-fill" id="rip-fill"></div></div>
+                    <p id="rip-status">Drag to rip open!</p>
+                </div>
+                <div class="flip-container" id="flip-container"></div>
+            </div>
+            <div class="tab-content" id="tab-battle">
+                <h2>⚔️ Battle</h2>
+                <div class="battle-box" id="battle-box"></div>
+                <button class="move-btn" id="find-battle-btn">Find Opponent</button>
+            </div>
+            <div class="tab-content" id="tab-trades">
+                <h2>🔄 Trade Offers</h2>
+                <div id="trades-container"></div>
+            </div>
+        </main>
+        <nav class="bottom-nav">
+            <div class="nav-item active" data-tab="collection"><span>📚</span>Collection</div>
+            <div class="nav-item" data-tab="packs"><span>🎴</span>Packs</div>
+            <div class="nav-item" data-tab="battle"><span>⚔️</span>Battle</div>
+            <div class="nav-item" data-tab="trades"><span>🔄</span>Trades</div>
+        </nav>
+    </div>
 
-    <div class="modal-overlay" id="detail-modal"><div class="modal-panel"><button class="modal-close" id="modal-close">&times;</button><img id="modal-art" style="width:130px;"><h2 id="modal-name"></h2><p id="modal-fact"></p></div></div>
-    <div class="tutorial-overlay hidden" id="tutorial"><div class="tutorial-box"><button id="tutorial-close">&times;</button><h2>Welcome!</h2><p id="tutorial-text"></p><div><button class="btn" id="tutorial-prev">Previous</button><button class="btn btn-primary" id="tutorial-next">Next</button></div></div></div>
+    <div class="modal" id="card-modal">
+        <div class="modal-content">
+            <button class="close-btn" id="modal-close">&times;</button>
+            <img id="modal-img" src="" alt="">
+            <h3 id="modal-name"></h3>
+            <p id="modal-rarity"></p>
+            <div id="modal-stats"></div>
+        </div>
+    </div>
 
     <script>
         (function() {
-            const allPokemon = [];
-            const collection = new Set();
+            const API_BASE = 'https://api.tcgdex.net/v2/en';
             let coins = 500;
-            let trainer = "Trainer";
-            let friends = [];
-            let messages = {};
-            let currentTab = 'collection';
-            let ripProgress = 0;
-            let currentPack = null;
-            let pendingCards = [];
+            let collection = new Set();
+            let currentSet = 'swsh1';
+            let allSetCards = [];
             let battle = null;
+            const rarityWeights = {
+                'Common': 60, 'Uncommon': 25, 'Rare': 10, 'Rare Holo': 8,
+                'Ultra Rare': 4, 'Secret Rare': 1, 'Amazing Rare': 2, 'Radiant Rare': 2,
+                'Trainer Gallery Rare Holo': 3, 'Double Rare': 5, 'Illustration Rare': 2, 'Special Illustration Rare': 1
+            };
 
-            const tutorialSteps = [
-                "Welcome to CardPocket! Collect cards, open packs, battle, and trade.",
-                "Your Collection holds your cards. Click any to view details.",
-                "Open packs: choose a pack, then drag the pack image to rip it open!",
-                "Battle with moves to earn coins. Trade with AI or friends.",
-                "Quiz & Index: test your knowledge and browse all Pokémon."
-            ];
-            let tutorialStep = 0;
-
-            function save() { localStorage.setItem('cardpocket', JSON.stringify({ coins, trainer, collection: [...collection],
-                    friends, messages })); }
-
-            function load() {
-                const s = localStorage.getItem('cardpocket');
+            // Load/Save
+            function saveGame() {
+                localStorage.setItem('pocketcollect', JSON.stringify({ coins, collection: [...collection] }));
+            }
+            function loadGame() {
+                const s = localStorage.getItem('pocketcollect');
                 if (s) try {
                     const d = JSON.parse(s);
                     coins = d.coins || 500;
-                    trainer = d.trainer || 'Trainer';
-                    collection.clear();
-                    (d.collection || []).forEach(id => collection.add(id));
-                    friends = d.friends || [];
-                    messages = d.messages || {};
+                    collection = new Set(d.collection || []);
                 } catch (e) {}
             }
 
             function updateCoins() { document.getElementById('coin-balance').textContent = coins;
-                save(); }
+                saveGame(); }
 
-            function rarity(bst) {
-                if (bst >= 600) return 'Hyper Rare';
-                if (bst >= 550) return 'Special Illustration';
-                if (bst >= 450) return 'Ultra Rare';
-                if (bst >= 350) return 'Rare';
-                if (bst >= 250) return 'Uncommon';
-                return 'Common';
+            // Tab navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const tab = item.dataset.tab;
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove(
+                        'active'));
+                    document.getElementById('tab-' + tab).classList.add('active');
+                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                    item.classList.add('active');
+                    if (tab === 'collection') renderCollection();
+                    if (tab === 'packs') loadSets();
+                    if (tab === 'trades') generateOffers();
+                });
+            });
+
+            // Fetch functions
+            async function fetchSets() {
+                const res = await fetch(`${API_BASE}/sets`);
+                return res.json();
+            }
+            async function fetchCardsBySet(setId) {
+                const res = await fetch(`${API_BASE}/cards?set=${setId}`);
+                return res.json();
+            }
+            async function fetchCardDetails(cardId) {
+                const res = await fetch(`${API_BASE}/cards/${cardId}`);
+                return res.json();
             }
 
-            async function fetchPokemon(id) {
-                const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-                if (!r.ok) throw new Error('fail');
-                const d = await r.json();
-                const art = d.sprites.other['official-artwork'].front_default;
-                const pixel = d.sprites.front_default;
-                const bst = d.stats.reduce((s, st) => s + st.base_stat, 0);
-                return {
-                    id: d.id,
-                    name: d.name,
-                    art,
-                    pixel,
-                    types: d.types.map(t => t.type.name),
-                    stats: d.stats.map(s => s.base_stat),
-                    rarity: rarity(bst),
-                    bst
-                };
-            }
-
-            async function loadRange(start, end) {
-                const proms = [];
-                for (let i = start; i <= end; i++) proms.push(fetchPokemon(i).catch(() => null));
-                const res = await Promise.all(proms);
-                allPokemon.push(...res.filter(p => p));
-            }
-
-            function createCard(pokemon) {
-                const c = document.createElement('div');
-                c.className = 'pokemon-card';
-                c.innerHTML = `<div class="card-art"><img src="${pokemon.art}" alt="${pokemon.name}"></div>
-                <div class="card-info"><div class="card-name">${pokemon.name}</div>
-                <span class="rarity-badge rarity-${pokemon.rarity.toLowerCase().replace(/\s/g,'-')}">${pokemon.rarity}</span>
-                <div>${pokemon.types.map(t=>`<span class="type-badge type-${t}">${t}</span>`).join('')}</div></div>`;
-                c.addEventListener('click', () => showDetail(pokemon));
-                return c;
-            }
-
+            // Collection
             function renderCollection() {
-                const g = document.getElementById('collection-grid');
-                const owned = allPokemon.filter(p => collection.has(p.id));
-                g.innerHTML = owned.length ? '' : '<p>No cards yet. Open packs!</p>';
-                owned.forEach(p => g.appendChild(createCard(p)));
+                const grid = document.getElementById('collection-grid');
+                const owned = allSetCards.filter(c => collection.has(c.id));
+                grid.innerHTML = owned.length ? '' : '<p style="color:#aaa;">No cards yet. Open packs!</p>';
+                owned.forEach(card => {
+                    const div = document.createElement('div');
+                    div.className = 'card-item';
+                    div.innerHTML = `<img src="${card.image}/low.webp" alt="${card.name}" loading="lazy">
+                        <div class="card-name">${card.name}</div>`;
+                    div.addEventListener('click', () => showCardDetail(card));
+                    grid.appendChild(div);
+                });
             }
 
-            function showDetail(p) {
-                document.getElementById('modal-art').src = p.art;
-                document.getElementById('modal-name').textContent = p.name;
-                document.getElementById('modal-fact').textContent = `${p.rarity} · BST ${p.bst}`;
-                document.getElementById('detail-modal').classList.add('show');
-            }
-            document.getElementById('modal-close').addEventListener('click', () => document.getElementById('detail-modal')
-                .classList.remove('show'));
-
-            // Pack definitions based on real TCG
-            const packTypes = [
-                { name: 'Scarlet & Violet', cost: 150, cards: 10, energy: true, rates: { Common: 70, Uncommon: 20, Rare: 7,
-                        'Double Rare': 2, 'Ultra Rare': 0.8, 'Illustration Rare': 0.2, 'Special Illustration': 0.1,
-                        'Hyper Rare': 0.02 } },
-                { name: '151', cost: 200, cards: 10, special: true, rates: { Common: 50, Uncommon: 25, Rare: 15,
-                        'Double Rare': 5, 'Ultra Rare': 2, 'Illustration Rare': 1, 'Special Illustration': 0.5,
-                        'Hyper Rare': 0.1 } },
-                { name: 'Trick or Trade', cost: 80, cards: 3, rates: { Common: 90, Uncommon: 8, Rare: 2 } },
-                { name: "McDonald's", cost: 60, cards: 3, rates: { Common: 95, Uncommon: 5 } },
-                { name: 'God Pack (1%)', cost: 500, cards: 5, rates: { 'Ultra Rare': 30, 'Hyper Rare': 70 } }
-            ];
-
-            function renderPacks() {
-                const s = document.getElementById('pack-selection');
-                s.innerHTML = packTypes.map(p => `
-                <div class="pack-card" onclick="window.startPack('${p.name}')">
-                    <div class="pack-icon">${p.name[0]}</div>
-                    <strong>${p.name}</strong><br><small>${p.cost} coins</small>
-                </div>`).join('');
+            async function showCardDetail(card) {
+                const details = await fetchCardDetails(card.id);
+                document.getElementById('modal-img').src = details.image + '/high.webp';
+                document.getElementById('modal-name').textContent = details.name;
+                document.getElementById('modal-rarity').textContent = details.rarity || '';
+                let stats = '';
+                if (details.hp) stats += `❤️ HP: ${details.hp}<br>`;
+                if (details.attacks) {
+                    details.attacks.forEach(a => {
+                        stats += `⚡ ${a.name}: ${a.damage || '—'}<br>`;
+                    });
+                }
+                document.getElementById('modal-stats').innerHTML = stats;
+                document.getElementById('card-modal').classList.add('active');
             }
 
-            window.startPack = function(name) {
-                const pack = packTypes.find(p => p.name === name);
-                if (coins < pack.cost) return alert('Not enough coins!');
-                coins -= pack.cost;
-                updateCoins();
-                currentPack = pack;
-                ripProgress = 0;
-                document.getElementById('pack-rip-area').classList.add('active');
-                document.getElementById('rip-fill').style.width = '0%';
-                document.getElementById('rip-status').textContent = 'Drag the pack!';
-                document.getElementById('pack-flip-container').innerHTML = '';
-                pendingCards = [];
-            };
-
-            const ripImg = document.getElementById('rip-image');
-            ripImg.addEventListener('mousedown', () => {
-                const onMove = (e) => {
-                    e.preventDefault();
-                    ripProgress = Math.min(100, ripProgress + 5);
-                    document.getElementById('rip-fill').style.width = ripProgress + '%';
-                    if (ripProgress >= 100) {
-                        document.removeEventListener('mousemove', onMove);
-                        document.removeEventListener('mouseup', onUp);
-                        ripComplete();
-                    }
-                };
-                const onUp = () => {
-                    document.removeEventListener('mousemove', onMove);
-                    document.removeEventListener('mouseup', onUp);
-                };
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('mouseup', onUp);
+            document.getElementById('modal-close').addEventListener('click', () => {
+                document.getElementById('card-modal').classList.remove('active');
             });
-            ripImg.addEventListener('touchstart', (e) => {
+
+            // Packs
+            async function loadSets() {
+                const sets = await fetchSets();
+                const selector = document.getElementById('set-selector');
+                selector.innerHTML = sets.slice(0, 15).map(s => `
+                    <button class="set-btn ${s.id === currentSet ? 'active' : ''}" data-set="${s.id}">${s.name}</button>
+                `).join('');
+                document.querySelectorAll('.set-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        currentSet = btn.dataset.set;
+                        document.querySelectorAll('.set-btn').forEach(b => b.classList.remove(
+                            'active'));
+                        btn.classList.add('active');
+                        allSetCards = await fetchCardsBySet(currentSet);
+                        // enrich with rarity
+                        allSetCards = allSetCards.map(c => ({ ...c, rarity: c.rarity || 'Common' }));
+                    });
+                });
+                if (!allSetCards.length && sets.length) {
+                    currentSet = sets[0].id;
+                    allSetCards = await fetchCardsBySet(currentSet);
+                }
+            }
+
+            let ripProgress = 0;
+            const ripImg = document.getElementById('pack-rip-img');
+            const ripFill = document.getElementById('rip-fill');
+            const ripStatus = document.getElementById('rip-status');
+            ripImg.addEventListener('mousedown', startRip);
+            ripImg.addEventListener('touchstart', startRip, { passive: false });
+
+            function startRip(e) {
                 e.preventDefault();
-                const onMove = () => {
-                    ripProgress = Math.min(100, ripProgress + 5);
-                    document.getElementById('rip-fill').style.width = ripProgress + '%';
+                ripProgress = 0;
+                ripFill.style.width = '0%';
+                ripStatus.textContent = 'Ripping...';
+                const move = () => {
+                    ripProgress = Math.min(100, ripProgress + 6);
+                    ripFill.style.width = ripProgress + '%';
                     if (ripProgress >= 100) {
-                        document.removeEventListener('touchmove', onMove);
-                        document.removeEventListener('touchend', onEnd);
-                        ripComplete();
+                        stopRip();
+                        openPack();
                     }
                 };
-                const onEnd = () => {
-                    document.removeEventListener('touchmove', onMove);
-                    document.removeEventListener('touchend', onEnd);
+                const stopRip = () => {
+                    document.removeEventListener('mousemove', move);
+                    document.removeEventListener('mouseup', stopRip);
+                    document.removeEventListener('touchmove', move);
+                    document.removeEventListener('touchend', stopRip);
                 };
-                document.addEventListener('touchmove', onMove);
-                document.addEventListener('touchend', onEnd);
-            });
-
-            function ripComplete() {
-                document.getElementById('pack-rip-area').classList.remove('active');
-                generatePackCards();
+                document.addEventListener('mousemove', move);
+                document.addEventListener('mouseup', stopRip);
+                document.addEventListener('touchmove', move);
+                document.addEventListener('touchend', stopRip);
             }
 
-            function generatePackCards() {
-                const pool = [...allPokemon];
+            function openPack() {
+                if (coins < 100) return alert('Need 100 coins!');
+                coins -= 100;
+                updateCoins();
+                ripStatus.textContent = 'Revealing...';
                 const cards = [];
-                const pack = currentPack;
-                const total = pack.cards + (pack.energy ? 1 : 0);
-                for (let i = 0; i < total; i++) {
-                    if (pack.energy && i === total - 1) {
-                        cards.push({ name: 'Energy', art: '⚡', rarity: 'Common' });
-                        continue;
-                    }
+                for (let i = 0; i < 5; i++) {
                     const roll = Math.random() * 100;
                     let cum = 0;
                     let rarity = 'Common';
-                    for (const [r, w] of Object.entries(pack.rates)) { cum += w; if (roll <= cum) { rarity = r; break; } }
-                    const cands = pool.filter(p => p.rarity === rarity);
-                    const pick = cands.length ? cands[Math.floor(Math.random() * cands.length)] : pool[Math.floor(Math
-                        .random() * pool.length)];
+                    for (const [r, w] of Object.entries(rarityWeights)) { cum += w; if (roll <= cum) { rarity = r;
+                            break; } }
+                    const pool = allSetCards.filter(c => c.rarity === rarity);
+                    const pick = pool.length ? pool[Math.floor(Math.random() * pool.length)] : allSetCards[Math.floor(Math
+                        .random() * allSetCards.length)];
                     cards.push(pick);
                     collection.add(pick.id);
                 }
-                pendingCards = cards;
-                revealCards();
+                revealCards(cards);
+                saveGame();
+                renderCollection();
             }
 
-            function revealCards() {
-                const c = document.getElementById('pack-flip-container');
-                c.innerHTML = '';
-                pendingCards.forEach((card, i) => {
+            function revealCards(cards) {
+                const container = document.getElementById('flip-container');
+                container.innerHTML = '';
+                cards.forEach((card, i) => {
                     const fc = document.createElement('div');
                     fc.className = 'flip-card';
-                    const isEnergy = card.name === 'Energy';
-                    fc.innerHTML = `<div class="flip-card-inner">
-                    <div class="flip-back">?</div>
-                    <div class="flip-front">
-                        ${isEnergy ? '<div style="font-size:3rem;">⚡</div><strong>Energy</strong>' : `<img src="${card.art}" alt="${card.name}"><strong>${card.name}</strong><span class="rarity-badge rarity-${card.rarity.toLowerCase().replace(/\s/g,'-')}">${card.rarity}</span>`}
-                    </div></div>`;
-                    c.appendChild(fc);
+                    fc.innerHTML = `
+                        <div class="flip-inner">
+                            <div class="flip-back">?</div>
+                            <div class="flip-front">
+                                <img src="${card.image}/low.webp" alt="${card.name}">
+                                <div class="rarity">${card.rarity || ''}</div>
+                            </div>
+                        </div>`;
+                    container.appendChild(fc);
                     setTimeout(() => fc.classList.add('flipped'), 400 * (i + 1));
                 });
-                renderCollection();
-                pendingCards = [];
             }
 
             // Battle
-            function genMoves(p) {
-                const m = { fire: ['Ember', 'Fire Spin'], water: ['Water Gun', 'Bubble'], grass: ['Vine Whip',
-                        'Razor Leaf'
-                    ], electric: ['Thunder Shock', 'Spark'], psychic: ['Confusion', 'Psybeam'], normal: ['Tackle',
-                        'Quick Attack'
-                    ], fighting: ['Karate Chop', 'Low Kick'], dark: ['Bite', 'Feint Attack'], steel: ['Metal Claw',
-                        'Iron Head'
-                    ], ice: ['Ice Shard', 'Frost Breath'], poison: ['Poison Sting', 'Acid'], ground: ['Mud Slap',
-                    'Dig'], flying: ['Peck', 'Wing Attack'], bug: ['String Shot', 'Bug Bite'], rock: ['Rock Throw',
-                        'Rollout'
-                    ], ghost: ['Lick', 'Shadow Sneak'], dragon: ['Dragon Rage', 'Twister'], fairy: ['Fairy Wind',
-                        'Disarming Voice'
-                    ] };
-                return m[p.types[0]] || ['Tackle', 'Growl'];
-            }
-
-            function startBattle() {
-                const owned = allPokemon.filter(p => collection.has(p.id));
-                if (!owned.length) return alert('Need cards!');
-                const pl = owned[Math.floor(Math.random() * owned.length)];
-                const op = allPokemon[Math.floor(Math.random() * allPokemon.length)];
-                battle = { player: { ...pl, hp: pl.stats[0], maxHp: pl.stats[0] }, opponent: { ...op, hp: op.stats[0],
-                        maxHp: op.stats[0] }, pmoves: genMoves(pl), omoves: genMoves(op) };
+            async function findOpponent() {
+                if (!collection.size) return alert('Need cards to battle!');
+                const owned = allSetCards.filter(c => collection.has(c.id));
+                const playerCard = owned[Math.floor(Math.random() * owned.length)];
+                const opponentCard = allSetCards[Math.floor(Math.random() * allSetCards.length)];
+                const pDetail = await fetchCardDetails(playerCard.id);
+                const oDetail = await fetchCardDetails(opponentCard.id);
+                battle = {
+                    player: { ...pDetail, hp: pDetail.hp || 100, maxHp: pDetail.hp || 100 },
+                    opponent: { ...oDetail, hp: oDetail.hp || 100, maxHp: oDetail.hp || 100 }
+                };
                 renderBattle();
             }
 
             function renderBattle() {
                 if (!battle) return;
-                const b = battle;
-                document.getElementById('battle-screen').innerHTML = `
-                <div class="battle-pokemon">
-                    <h3>Opponent ${b.opponent.name}</h3><img src="${b.opponent.art}" width="110">
-                    <div class="hp-bar"><div class="hp-fill" style="width:${(b.opponent.hp/b.opponent.maxHp)*100}%"></div></div>
-                    HP: ${b.opponent.hp}/${b.opponent.maxHp}
-                </div>
-                <div class="battle-pokemon">
-                    <h3>Your ${b.player.name}</h3><img src="${b.player.art}" width="110">
-                    <div class="hp-bar"><div class="hp-fill" style="width:${(b.player.hp/b.player.maxHp)*100}%"></div></div>
-                    HP: ${b.player.hp}/${b.player.maxHp}
-                    ${b.pmoves.map((m,i) => `<button class="move-btn" onclick="window.useMove(${i})">${m}</button>`).join('')}
-                </div>`;
+                const box = document.getElementById('battle-box');
+                box.innerHTML = `
+                    <div class="battle-card">
+                        <img src="${battle.opponent.image}/low.webp" alt="">
+                        <h4>${battle.opponent.name}</h4>
+                        <div class="hp-bar"><div class="hp-fill" style="width:${(battle.opponent.hp/battle.opponent.maxHp)*100}%"></div></div>
+                    </div>
+                    <div style="font-size:2rem;">VS</div>
+                    <div class="battle-card">
+                        <img src="${battle.player.image}/low.webp" alt="">
+                        <h4>${battle.player.name}</h4>
+                        <div class="hp-bar"><div class="hp-fill" style="width:${(battle.player.hp/battle.player.maxHp)*100}%"></div></div>
+                        <div>
+                            ${battle.player.attacks?.map((a, i) => `<button class="move-btn" onclick="attack(${i})">${a.name} (${a.damage || '?'})</button>`).join('') || '<button class="move-btn">Struggle</button>'}
+                        </div>
+                    </div>`;
             }
 
-            window.useMove = function(i) {
+            window.attack = function(index) {
                 if (!battle) return;
-                const b = battle;
-                b.opponent.hp = Math.max(0, b.opponent.hp - (Math.floor(Math.random() * 20) + 10));
-                if (b.opponent.hp <= 0) { coins += 40;
+                const playerAtk = battle.player.attacks?.[index] || { damage: 10 };
+                const dmg = parseInt(playerAtk.damage) || 10;
+                battle.opponent.hp = Math.max(0, battle.opponent.hp - dmg);
+                if (battle.opponent.hp <= 0) {
+                    coins += 50;
                     updateCoins();
-                    alert('You won! +40 coins');
+                    alert('You won! +50 coins');
                     battle = null;
-                    document.getElementById('battle-screen').innerHTML = ''; return; }
-                b.player.hp = Math.max(0, b.player.hp - (Math.floor(Math.random() * 15) + 5));
-                if (b.player.hp <= 0) { alert('You lost!');
+                    document.getElementById('battle-box').innerHTML = '';
+                    return;
+                }
+                const oppAtk = battle.opponent.attacks?.[0] || { damage: 10 };
+                const odmg = parseInt(oppAtk.damage) || 10;
+                battle.player.hp = Math.max(0, battle.player.hp - odmg);
+                if (battle.player.hp <= 0) {
+                    alert('You lost!');
                     battle = null;
-                    document.getElementById('battle-screen').innerHTML = ''; return; }
+                    document.getElementById('battle-box').innerHTML = '';
+                    return;
+                }
                 renderBattle();
             };
 
+            document.getElementById('find-battle-btn').addEventListener('click', findOpponent);
+
             // Trades
-            function genOffers() {
-                if (!collection.size) return document.getElementById('offers-container').innerHTML = '<p>No cards.</p>';
-                const names = ['Red', 'Blue', 'Green'];
-                const offs = [];
-                for (let i = 0; i < 3; i++) {
-                    const rid = [...collection][Math.floor(Math.random() * collection.size)];
-                    const off = allPokemon[Math.floor(Math.random() * allPokemon.length)];
-                    if (rid === off.id) continue;
-                    offs.push({ trainer: names[i % names.length], req: allPokemon.find(p => p.id === rid), off });
+            function generateOffers() {
+                if (!collection.size) {
+                    document.getElementById('trades-container').innerHTML = '<p style="color:#aaa;">No cards to trade.</p>';
+                    return;
                 }
-                document.getElementById('offers-container').innerHTML = offs.map(o => `
-                <div class="trade-offer"><strong>${o.trainer}</strong> wants ${o.req.name}
-                <img src="${o.req.art}" width="50"> &rarr; <img src="${o.off.art}" width="50"> ${o.off.name}
-                <button class="btn btn-accept" data-r="${o.req.id}" data-o="${o.off.id}">Accept</button>
-                <button class="btn btn-decline">Decline</button></div>`).join('');
-                document.querySelectorAll('.btn-accept').forEach(b => b.addEventListener('click', function() {
-                    const ri = +this.dataset.r,
-                        oi = +this.dataset.o;
-                    if (collection.has(ri)) { collection.delete(ri);
-                        collection.add(oi);
-                        renderCollection();
-                        genOffers(); }
-                }));
-                document.querySelectorAll('.btn-decline').forEach(b => b.addEventListener('click', genOffers));
+                const offers = [];
+                const traders = ['Red', 'Blue', 'Green'];
+                for (let i = 0; i < 3; i++) {
+                    const reqId = [...collection][Math.floor(Math.random() * collection.size)];
+                    const reqCard = allSetCards.find(c => c.id === reqId);
+                    const offCard = allSetCards[Math.floor(Math.random() * allSetCards.length)];
+                    if (reqCard.id === offCard.id) continue;
+                    offers.push({ trader: traders[i], reqCard, offCard });
+                }
+                document.getElementById('trades-container').innerHTML = offers.map(o => `
+                    <div class="trade-offer">
+                        <img src="${o.reqCard.image}/low.webp" width="60"><span>${o.trader} wants your ${o.reqCard.name}</span>
+                        <img src="${o.offCard.image}/low.webp" width="60"><span>→ ${o.offCard.name}</span>
+                        <button class="move-btn" onclick="acceptTrade('${o.reqCard.id}', '${o.offCard.id}')">Accept</button>
+                    </div>`).join('');
             }
 
-            function addFriend() {
-                const n = document.getElementById('friend-input').value.trim();
-                if (!n || friends.includes(n)) return;
-                friends.push(n);
-                document.getElementById('friend-input').value = '';
-                renderFriends();
-                save();
-            }
-
-            function renderFriends() {
-                const l = document.getElementById('friend-list');
-                l.innerHTML = friends.map(f => `<div class="friend-entry"><span>${f}</span>
-                <button class="btn btn-primary" onclick="window.chat('${f}')">Chat</button>
-                <button class="btn btn-gold" onclick="window.tradeFriend('${f}')">Trade</button></div>`).join(
-                '') || '<p>No friends.</p>';
-            }
-
-            window.chat = function(f) {
-                const cw = document.getElementById('chat-window');
-                const ms = messages[f] || [];
-                cw.innerHTML = ms.map(m => `<div><strong>${m.from}:</strong> ${m.text}</div>`).join('') +
-                    `<div><input id="ci" placeholder="Message..."><button id="sb">Send</button></div>`;
-                document.getElementById('sb').addEventListener('click', () => {
-                    const t = document.getElementById('ci').value.trim();
-                    if (!t) return;
-                    if (!messages[f]) messages[f] = [];
-                    messages[f].push({ from: trainer, text: t });
-                    save();
-                    window.chat(f);
-                });
-            };
-            window.tradeFriend = function(f) {
-                const owned = allPokemon.filter(p => collection.has(p.id));
-                if (!owned.length) return alert('No cards.');
-                const r = owned[Math.floor(Math.random() * owned.length)];
-                const o = allPokemon[Math.floor(Math.random() * allPokemon.length)];
-                if (r.id === o.id) return;
-                if (confirm(`Offer ${f} your ${r.name} for ${o.name}?`)) alert('Trade sent!');
+            window.acceptTrade = function(reqId, offId) {
+                if (collection.has(reqId)) {
+                    collection.delete(reqId);
+                    collection.add(offId);
+                    saveGame();
+                    renderCollection();
+                    generateOffers();
+                }
             };
 
-            function renderQuiz() {
-                if (!allPokemon.length) return;
-                const p = allPokemon[Math.floor(Math.random() * allPokemon.length)];
-                const q = [`What type is ${p.name}?`, p.types[0]];
-                document.getElementById('quiz-container').innerHTML = `<h3>${q[0]}</h3>
-                <button class="quiz-option">${q[1]}</button><button class="quiz-option">???</button>`;
-                document.querySelectorAll('.quiz-option')[0].addEventListener('click', () => { alert('Correct!');
-                    renderQuiz(); });
-                document.querySelectorAll('.quiz-option')[1].addEventListener('click', () => { alert('Wrong!');
-                    renderQuiz(); });
-            }
-
-            function renderIndex() {
-                document.getElementById('index-body').innerHTML = allPokemon.map(p => `
-                <tr><td>#${p.id}</td><td style="text-transform:capitalize;">${p.name}</td>
-                <td>${p.types.map(t=>`<span class="type-badge type-${t}">${t}</span>`).join('')}</td>
-                <td><img src="${p.pixel}" width="40" height="40"></td></tr>`).join('');
-            }
-
-            async function loadAll() {
-                document.getElementById('load-all-btn').disabled = true;
-                document.getElementById('load-all-btn').textContent = 'Loading...';
-                // Load all species + forms (up to 1164)
-                for (let i = 1; i <= 1025; i++) await loadRange(i, i);
-                // Additional forms (Alola, Galar, etc.)
-                for (let i = 10001; i <= 10249; i++) await loadRange(i, i);
-                for (let i = 10100; i <= 10177; i++) await loadRange(i, i);
-                renderIndex();
-                document.getElementById('load-all-btn').textContent = 'All Loaded!';
-            }
-
-            function switchTab(tab) {
-                document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('visible'));
-                document.getElementById('tab-' + tab).classList.add('visible');
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
-                if (tab === 'collection') renderCollection();
-                if (tab === 'packs') renderPacks();
-                if (tab === 'trades') genOffers();
-                if (tab === 'friends') renderFriends();
-                if (tab === 'learn') renderQuiz();
-                if (tab === 'index') renderIndex();
-            }
-
-            function tutorial() {
-                const update = () => {
-                    document.getElementById('tutorial-text').textContent = tutorialSteps[tutorialStep];
-                    document.getElementById('tutorial-prev').style.visibility = tutorialStep === 0 ? 'hidden' :
-                        'visible';
-                };
-                update();
-                document.getElementById('tutorial').classList.remove('hidden');
-                document.getElementById('tutorial-next').onclick = () => { if (tutorialStep < tutorialSteps.length -
-                        1) { tutorialStep++;
-                        update(); } else document.getElementById('tutorial').classList.add('hidden'); };
-                document.getElementById('tutorial-prev').onclick = () => { if (tutorialStep > 0) { tutorialStep--;
-                        update(); } };
-                document.getElementById('tutorial-close').onclick = () => document.getElementById('tutorial').classList
-                    .add('hidden');
-            }
-
+            // Init
             async function init() {
-                load();
-                document.getElementById('trainer-input').value = trainer;
+                loadGame();
                 updateCoins();
-                document.getElementById('collection-grid').innerHTML = '<p>Loading Pokémon...</p>';
-                await loadRange(1, 151);
+                document.getElementById('collection-grid').innerHTML = '<p style="color:#aaa;">Loading...</p>';
+                allSetCards = await fetchCardsBySet('swsh1');
                 renderCollection();
-                renderPacks();
-                renderFriends();
-                document.getElementById('save-trainer').addEventListener('click', () => {
-                    trainer = document.getElementById('trainer-input').value.trim() || 'Trainer';
-                    save();
-                });
-                document.getElementById('find-battle-btn').addEventListener('click', startBattle);
-                document.getElementById('refresh-offers').addEventListener('click', genOffers);
-                document.getElementById('add-friend').addEventListener('click', addFriend);
-                document.getElementById('load-all-btn').addEventListener('click', loadAll);
-                document.querySelectorAll('.nav-btn[data-tab]').forEach(b => b.addEventListener('click', () => switchTab(b
-                    .dataset.tab)));
-                if (!localStorage.getItem('cardpocket_tutorial')) { tutorial();
-                    localStorage.setItem('cardpocket_tutorial', 'true'); }
+                loadSets();
+                generateOffers();
             }
             init();
         })();
